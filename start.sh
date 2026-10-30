@@ -28,9 +28,9 @@ cd /app/ai-toolkit/ui
 npx prisma db push
 
 # --- HF dataset sync (massshare/zoo_v8): restore on boot, push every 5 min ---
-# local datasets/  -> repo folder "datasets"  (includes latent/analysis cache,
-#                     stored next to the clips, so re-analysis is skipped after
-#                     a redeploy)
+# local datasets/  -> repo folder "dataset"   (note: SINGULAR in the repo.
+#                     Includes latent/analysis cache stored next to the clips,
+#                     so re-analysis is skipped after a redeploy)
 # local output/    -> repo folder "outputs"   (trained LoRAs + samples)
 SYNC_REPO="massshare/zoo_v8"
 if [ -n "${HF_TOKEN:-}" ]; then
@@ -39,7 +39,7 @@ if [ -n "${HF_TOKEN:-}" ]; then
   echo "restoring datasets + outputs from $SYNC_REPO..."
   hf download "$SYNC_REPO" --repo-type dataset --local-dir "$TMP" \
     --token "$HF_TOKEN" >/dev/null 2>&1 || echo "restore: nothing to pull yet (or failed)"
-  [ -d "$TMP/datasets" ] && cp -rn "$TMP/datasets/." /app/ai-toolkit/datasets/ 2>/dev/null
+  [ -d "$TMP/dataset" ]  && cp -rn "$TMP/dataset/."  /app/ai-toolkit/datasets/ 2>/dev/null
   [ -d "$TMP/outputs" ]  && cp -rn "$TMP/outputs/."  /app/ai-toolkit/output/
   rm -rf "$TMP"
 
@@ -48,7 +48,7 @@ if [ -n "${HF_TOKEN:-}" ]; then
     while true; do
       sleep 300
       if [ -d /app/ai-toolkit/datasets ]; then
-        hf upload "$SYNC_REPO" /app/ai-toolkit/datasets datasets \
+        hf upload "$SYNC_REPO" /app/ai-toolkit/datasets dataset \
           --repo-type dataset --token "$HF_TOKEN" >/dev/null 2>&1 \
           && echo "[sync] datasets pushed" || echo "[sync] datasets push failed"
       fi
