@@ -25,10 +25,9 @@ WORKDIR /app
 RUN git clone --depth 1 https://github.com/ostris/ai-toolkit.git
 
 WORKDIR /app/ai-toolkit
-# torch first, per upstream README (base image already ships it, but this
-# pins the exact upstream-tested cu130 wheel set)
-RUN pip install --no-cache-dir torch==2.13.0 torchvision==0.28.0 torchaudio==2.11.0 \
-    --index-url https://download.pytorch.org/whl/cu130
+# NOTE: no explicit torch install — the base image already ships
+# torch 2.13.0+cu130 / torchvision / torchaudio (upstream's pinned set).
+# Installing them again via pip would double ~7 GB of layers for nothing.
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Build the UI at image-build time (tsc worker + next build + prisma client).
