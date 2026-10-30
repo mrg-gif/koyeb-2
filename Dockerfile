@@ -12,8 +12,10 @@ FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-devel
 # Ubuntu 24.04's pip refuses system-wide installs (PEP 668); allow them
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
+# ffmpeg: torchcodec (video/audio loading) needs the shared libs
+# (libavutil.so.*) — Ubuntu 24.04 ships FFmpeg 6, which torchcodec supports
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl ca-certificates cuda-compat-13-0 \
+    git curl ca-certificates cuda-compat-13-0 ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Node.js 22 — the AI-Toolkit UI requires Node > 20
